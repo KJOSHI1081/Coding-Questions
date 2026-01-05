@@ -52,7 +52,7 @@ def sum_of_two_integers(a, b):
         a, b = a ^ b, (a & b) << 1
     return (mask & a) if b > 0 else a
 
-def divide_two_integers(dividend, divisor):
+def divide_two_integers_with_abs(dividend, divisor):
     """
     Divide two integers without using multiplication, division, or mod operator.
     This function performs integer division using bit manipulation techniques.
@@ -88,8 +88,15 @@ def divide_two_integers(dividend, divisor):
         a ^= b,	   XOR,		    Determine if signs differ
         a |= b,	   Bitwise OR,  Set a specific bit to 1
     """ 
+    MAX_INT = 2**31 - 1
+    MIN_INT = -2**31
+
     if divisor == 0:
         raise ValueError("Divisor cannot be zero.")
+    
+    # Handle the specific overflow condition
+    if dividend == MIN_INT and divisor == -1:
+        return MAX_INT
     
     negative = (dividend < 0) ^ (divisor < 0)
     dividend, divisor = abs(dividend), abs(divisor)
@@ -101,15 +108,42 @@ def divide_two_integers(dividend, divisor):
     for i in reversed(range(32)):
         # At the start of each iteration, we check if the current bit position can fit
         # into the remaining dividend. We do this by shifting the divisor left by i bits.
-        if (dividend >> i) >= divisor:
+        a = dividend >> i
+        b = divisor << i
+        if a >= divisor:
             # If it fits, we subtract the shifted divisor from the dividend
-            dividend -= divisor << i
+            dividend -= b
             # We also set the corresponding bit in the quotient
             quotient |= 1 << i
             
-    return -quotient if negative else quotient
+    ans = -quotient if negative else quotient
+    return max(MIN_INT, min(ans, MAX_INT))
 
 
+def divide_two_integers_without_abs(dividend: int, divisor: int) -> int:
+    MAX_INT = 2**31 -1
+    MIN_INT = -2**31
+
+    if divisor == 0: raise ValueError("Number can not be divisible by 0!")
+
+    if dividend == MIN_INT and divisor == -1:
+        return MAX_INT
+    
+    negative = (dividend < 0) ^ (divisor < 0)
+    quotient = 0
+
+    if dividend > 0:
+        dividend = -dividend
+    if divisor > 0:
+        divisor = -divisor
+
+    for i in reversed(range(32)):
+        b = divisor << i
+        if b >= dividend and b < 0:
+            dividend -= b
+            quotient |= 1 << i
+    ans = -quotient if negative else quotient
+    return ans
 
 
 if __name__ == "__main__":
