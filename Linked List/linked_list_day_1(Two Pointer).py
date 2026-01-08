@@ -1,5 +1,10 @@
 """
 TOPIC: LINKED LISTS - DAY 1
+    1. REVERSE A LINKED LIST
+    2. DETECT A CYCLE
+    3. MERGE TWO SORTED LISTS
+    4. REMOVE N-th NODE FROM END
+    5. MIDDLE OF THE LINKED LIST
 5 Frequent Interview Questions & Solutions with Test Cases
 """
 
