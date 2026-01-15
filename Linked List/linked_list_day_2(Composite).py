@@ -84,24 +84,62 @@ class LinkedListSolutions:
     Real-World Example
     Imagine a Undo/Redo Stack or a Task Scheduler where you want to 
     balance the oldest tasks with the newest tasks to ensure both "freshness" and "completion."
+
+    You are given the head of a singly linked-list. The list can be represented as:
+
+    L0 → L1 → … → Ln - 1 → Ln
+    Reorder the list to be on the following form:
+
+    L0 → Ln → L1 → Ln - 1 → L2 → Ln - 2 → …
+    You may not modify the values in the list's nodes. Only nodes themselves may be changed.
+    Example 1:
+    Input: head = [1,2,3,4]
+    Output: [1,4,2,3]
+
+    Example2:
+    Input: head = [1,2,3,4,5]
+    Output: [1,5,2,4,3]
+    After creating two lists from one
+    first=[1, 2, 3], second=[5, 4]
+    ===========iteration=0========
+    t1, t2 = first.next, second.next; makes t1=[2, 3], t2=[4]
+    first.next = second; makes first=[1, 5, 4], first.next=[5, 4]
+    second.next = t1; makes second=[5, 2, 3], second.next=[2, 3]
+    first, second = t1, t2; makes first=[2, 3], second=[4]
+    Now new head=[1, 5, 2, 3]
+    ===========iteration=1========
+    t1, t2 = first.next, second.next; makes t1=[3], t2=[]
+    first.next = second; makes first=[2, 4], first.next=[4]
+    second.next = t1; makes second=[4, 3], second.next=[3]
+    first, second = t1, t2; makes first=[3], second=[]
+    Now new head=[1, 5, 2, 4, 3]
     '''
     def reorderList(self, head: ListNode) -> None:
-        if not head: return
-        # A. Find middle (Slow/Fast)
-        slow, fast = head, head
+        if not head or not head.next:
+            return
+
+        # PHASE 1: Find the middle (Standard Pattern)
+        # For 1->2->3->4, slow will end at 2.
+        slow, fast = head, head.next
         while fast and fast.next:
             slow = slow.next
             fast = fast.next.next
-            
-        # B. Reverse second half
-        prev, curr = None, slow.next
-        slow.next = None # Disconnect the two halves
-        while curr:
-            nxt = curr.next
-            curr.next = prev
-            prev = curr
-            curr = nxt       
-        # C. Merge/Interleave (head and prev)
+
+        # PHASE 2: Reverse the second half (Standard Pattern)
+        # second starts at 3->4
+        second = slow.next
+        slow.next = None # Sever the connection! (Critical for Staff level)
+        
+        prev = None
+        while second:
+            tmp = second.next
+            second.next = prev
+            prev = second
+            second = tmp
+        # 'prev' is now the head of the reversed second half: 4->3
+
+        # PHASE 3: Interleave (The "Zip" Pattern)
+        # first: 1->2, second: 4->3
         first, second = head, prev
         while second:
             tmp1, tmp2 = first.next, second.next
